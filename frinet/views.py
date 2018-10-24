@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.shortcuts import render_to_response
 from django.db.utils import IntegrityError
+from django.core.cache import cache
 
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
@@ -36,7 +37,12 @@ def get_posts(request):
     user = request._request.user
 
     # TODO: Your caching logic here
-
+    #cache._cache.flush_all()
+    cache_key = user
+    cache_time = 86400 
+    data = cache.get(cache_key)
+    if data:
+        return JsonResponse(data, safe=False)
     
     all_users = list(user.friends.all())
     all_users.append(user)
@@ -50,7 +56,8 @@ def get_posts(request):
 
     # limit the post number to 25 and serialize the post
     post_ser = [PostSerializer(p).data for p in all_posts[:25]]
-    
+    cache.set(cache_key, post_ser, cache_time)
+
     return JsonResponse(post_ser, safe=False)
 
 
