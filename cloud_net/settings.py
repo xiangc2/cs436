@@ -25,7 +25,7 @@ SECRET_KEY = 'd*j@x24s9^qu#r(jcm48)t37&7i++(&h&#l^ytr&=y1@p3y2(&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["52.91.30.11"]
+ALLOWED_HOSTS = ["54.89.245.225"]
 
 
 # Application definition
@@ -77,21 +77,39 @@ WSGI_APPLICATION = 'cloud_net.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+if 'RDS_HOSTNAME' in os.environ:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            #'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT']
+        }
     }
-}
 
 
 # MemCache
+#CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#        'LOCATION': '127.0.0.1:11211',
+#    }
+#}
+
+# ElastiCache
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
+        'BACKEND': 'django_elasticache.memcached.ElastiCache',
+        'LOCATION': 'lab4-cache.p9zx8p.cfg.use1.cache.amazonaws.com:11211',
+        'OPTIONS' {
+            'IGNORE_CLUSTER_ERRORS': [True],
+        },
+    }     
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

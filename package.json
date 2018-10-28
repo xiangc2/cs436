@@ -40,7 +40,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "scripts": {
-    "build": "python3 manage.py makemigrations frinet && python3 manage.py migrate",
+    "build": "export NODE_ENV=production; python3 manage.py makemigrations frinet && python3 manage.py migrate & webpack --env.production --config webpack.config.js --progress --color",
     "start": "export NODE_ENV=production; uwsgi --socket :8001 --module cloud_net.wsgi & webpack --env.production  --watch --config webpack.config.js --progress --color"
   }
 }
